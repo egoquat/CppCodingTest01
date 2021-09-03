@@ -15,18 +15,15 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Test01ProgrammersCoding.cpp">
+    <ClCompile Include="Test01Sample01.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Test01Programmers.cpp">
+    <ClCompile Include="Test01Sample02.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Test01ProgrammersFarthest.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Test01ProgrammersFold.h">
+    <ClInclude Include="Test01Sample01.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>

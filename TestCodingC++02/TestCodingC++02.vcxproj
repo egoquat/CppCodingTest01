@@ -21,8 +21,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{a64e04e5-27ce-4597-b06c-523d23d8c855}</ProjectGuid>
-    <RootNamespace>TestCodingC</RootNamespace>
+    <ProjectGuid>{94e4df72-d2ee-4e3d-ada8-d03fd6a77748}</ProjectGuid>
+    <RootNamespace>TestCodingC02</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -139,12 +139,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Test01ProgrammersCoding.cpp" />
-    <ClCompile Include="Test01Programmers.cpp" />
+    <ClInclude Include="Test01Sample01.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Test01ProgrammersFarthest.h" />
-    <ClInclude Include="Test01ProgrammersFold.h" />
+    <ClCompile Include="Test01Sample01.cpp" />
+    <ClCompile Include="Test01Sample02.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
