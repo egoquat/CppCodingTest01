@@ -1,4 +1,3 @@
-#include "Test01.h"
 #include <string>
 #include <vector>
 #include <unordered_map>
@@ -12,6 +11,115 @@
 #include <functional>
 
 using namespace std;
+
+namespace QueueStack
+{
+	///////////////////////// QueueStack 패치
+	vector<int> solution(vector<int> progresses, vector<int> speeds) {
+		queue<pair<int, int>> queues;
+		for (int i = 0; i < progresses.size(); ++i)
+			queues.push(pair<int, int>(progresses[i],
+				std::ceil((100.0f - (float)progresses[i]) / (float)speeds[i])));
+		vector<int> answer;
+		int process = 0;
+		while (queues.size() >= 1)
+		{
+			pair<int, int>& p = queues.front();
+			if (process < p.second)
+			{
+				process = p.second;
+				answer.push_back(1);
+			}
+			else
+			{
+				answer[answer.size() - 1]++;
+			}
+			queues.pop();
+		}
+
+		return answer;
+	}
+///////////////////////// QueueStack 패치 //
+
+///////////////////////// QueueStack 트럭
+	struct Truck {
+		int W = 0;
+		int Idx = 0;
+		int T = 0;
+		Truck(int w, int idx) { W = w; Idx = idx; }
+		Truck(Truck& o, int t) { W = o.W; Idx = o.Idx; T = t; }
+	};
+	int solution(int bridge_length, int weight, vector<int> truck_weights) {
+		int answer = 0;
+		queue<Truck> queue01, queue02;
+		for (int i = 0; i < truck_weights.size(); ++i) {
+			int w = truck_weights[i];
+			queue01.push(Truck(w, i));
+		}
+		int w = 0, len = bridge_length;
+		while (true != queue01.empty() || true != queue02.empty()) {
+			bool ispoped = false;
+			if (queue02.size() >= 1 && answer >= queue02.front().T) {
+				w = w - queue02.front().W;
+				//cout << " pop 02 T : " << (queue02.front().T) << endl;
+				queue02.pop();
+				ispoped = true;
+			}
+
+			if (true != queue01.empty() && w + queue01.front().W <= weight) {
+				w += queue01.front().W;
+				//cout << " push 02 T : " << (answer + len) << endl;
+				queue02.push(Truck(queue01.front(), answer + len));
+				queue01.pop();
+			}
+			answer++;
+		}
+		return answer;
+	}
+///////////////////////// QueueStack 트럭 //
+}
+
+namespace Heap
+{
+///////////////////////// Heap 디스크 컨트롤러
+	struct Compare
+	{
+		bool operator()(vector<int>& a, vector<int>& b) { return a[1] > b[1]; }
+	};
+
+	int solution(vector<vector<int>> jobs) {
+		sort(jobs.begin(), jobs.end());
+
+		priority_queue<vector<int>, vector<vector<int>>, Compare> queue;
+		int i = 0, time = 0, time_sum = 0;
+		while (i < jobs.size() || false == queue.empty())
+		{
+			if (i < jobs.size() && time >= jobs[i][0])
+			{
+				//cout << " queue.push/i:" << i << endl;
+				queue.push(jobs[i++]);
+				continue;
+			}
+
+			if (true == queue.empty())
+			{
+				time = jobs[i][0];
+				//cout << " (true == queue.empty())/i:" << i << "/time:" << time << endl;
+			}
+			else
+			{
+				time = time + queue.top()[1];
+				time_sum = time_sum + (time - queue.top()[0]);
+				queue.pop();
+				//cout << " queue.pop()/i:" << i << "/time:" << time << endl;
+			}
+		}
+
+		int answer = time_sum / jobs.size();
+		return answer;
+	}
+///////////////////////// Heap 디스크 컨트롤러
+}
 
 namespace test01
 {
