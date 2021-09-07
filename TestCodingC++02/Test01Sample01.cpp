@@ -35,43 +35,45 @@ vector<string> closestStraightCity(vector<string> cs, vector<int> xs, vector<int
 	}
 
 	const int NONE_IDX = -1;
-	const int DEFAULT_CLOSEST = std::pow(10, 9) + 1;
-	std::function<int(vector<int>*, int, int)> closestStraight = [&](vector<int>* dists, int idxFrom, int posIdxCurrent) {
-		int idx = NONE_IDX;
-		if (dists == nullptr) return idx;
+	const int DEFAULT_FARST = std::pow(10, 9) + 1;
+	std::function<pair<int, int>(vector<int>*, int, int, pair<int, int>)> closestStraight
+			= [&](vector<int>* dists, int idxFrom, int posIdxFrom, pair<int, int> other) {
+		std::pair<int, int> idx = other;
+		if (dists == nullptr || dists->size() <= 1) return idx;
 
-		int closest = DEFAULT_CLOSEST;
-		int posIdx = (posIdxCurrent + 1 % 2);
+		int posIdx = (posIdxFrom + 1 % 2);
 		int pos = cities[idxFrom].Pos[posIdx];
 		for (int i = 0; i < (*dists).size(); ++i) {
 			int iter = (*dists)[i];
 			if (iter == idxFrom) continue;
 			int dist = std::abs(pos - cities[iter].Pos[posIdx]);
-			if (closest > dist){
-				closest = dist; idx = iter;
+			if (idx.second > dist){
+				idx.second = dist; idx.first = iter;
 			}
 		}
-		return closest;
+		return idx;
 	};
 
 	const string NONE = "NONE";
 	vector<string> outputs(qs.size());
 	map<int, vector<int>>::iterator iterX, iterY;
+	map<string, City*>::iterator iterCity;
 	for (int i = 0; i < qs.size(); ++i) {
-		string& q = qs[i];
-		City& c = *citiesMap[q];
-		iterX = distsX.find(c.Pos[0]);
-		iterY = distsY.find(c.Pos[1]);
-		vector<int>* dsX = iterX != distsX.end()? &(iterX->second) : nullptr;
-		vector<int>* dsY = iterY != distsY.end()? &(iterY->second) : nullptr;
-		int idx = NONE_IDX;
-		idx = closestStraight(dsX, c.Idx, 0);
-		if (idx == NONE_IDX){
-			idx = closestStraight(dsY, c.Idx, 1);
-		}
-
 		string output = NONE;
-		if (idx != NONE_IDX) output = cities[idx].Name;
+		string& q = qs[i];
+		iterCity = citiesMap.find(q);
+		if (iterCity != citiesMap.end()) {
+			City& c = *citiesMap[q];
+			iterX = distsX.find(c.Pos[0]);
+			iterY = distsY.find(c.Pos[1]);
+			vector<int>* dsX = iterX != distsX.end() ? &(iterX->second) : nullptr;
+			vector<int>* dsY = iterY != distsY.end() ? &(iterY->second) : nullptr;
+			pair<int, int> idx = pair<int, int>(NONE_IDX, DEFAULT_FARST);
+			idx = closestStraight(dsX, c.Idx, 0, idx);
+			idx = closestStraight(dsY, c.Idx, 1, idx);
+			if (idx.first != NONE_IDX) output = cities[idx.first].Name;
+		}
+		
 		outputs[i] = output;
 	}
 	return outputs;
@@ -101,7 +103,7 @@ string rtrim(const string& str) {
 
 int main()
 {
-	ofstream fout(getenv("OUTPUT_PATH"));
+	//ofstream fout(getenv("OUTPUT_PATH"));
 
 	string c_count_temp;
 	getline(cin, c_count_temp);
@@ -166,16 +168,16 @@ int main()
 	vector<string> result = closestStraightCity(c, x, y, q);
 
 	for (int i = 0; i < result.size(); i++) {
-		fout << result[i];
+		cout << result[i];
 
 		if (i != result.size() - 1) {
-			fout << "\n";
+			cout << "\n";
 		}
 	}
 
-	fout << "\n";
+	cout << "\n";
 
-	fout.close();
+	//cout.close();
 
 	return 0;
 }
