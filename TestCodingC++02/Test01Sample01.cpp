@@ -6,117 +6,176 @@
 #include <string>
 #include <iomanip>
 #include <sstream>
+#include <functional>
+#include <map>
+#include <fstream>
 
 using namespace std;
 
-bool IsRepeat(string str, string& repeat, int& pos, int& len) {
-	for (int i = 0; i < str.size() / 2 - 1; ++i) {
-		for (int j = 1; j < str.size(); ++j) {
-			string sub = str.substr(i, j);
-			int r = 0, count = (str.size() - i) / sub.size(), rem = (str.size() - i) % sub.size();
-			if (rem == 0) rem = sub.size();
-			for (int k = 0; k < count; ++k) {
-				int sizeSub = (k == (count - 1)) ? rem : sub.size();
-				if (str.compare(i + (k * sub.size()), sizeSub, sub, 0, sizeSub) == 0) {
-					r++;
-				}
-				else {
-					break;
-				}
+struct City {
+	string Name;
+	int Idx, Adj = -1;
+	int Pos[2];
+	void Set(int idx, string& name, int x, int y) { Idx = idx; Name = name; Pos[0] = x; Pos[1] = y; }
+};
+
+vector<string> closestStraightCity(vector<string> cs, vector<int> xs, vector<int> ys, vector<string> qs) {
+	vector<City> cities;
+	map<string, City*> citiesMap;
+	map<int, vector<int>> distsX;
+	map<int, vector<int>> distsY;
+
+	cities.resize(cs.size());
+	for (int i = 0; i < cs.size(); ++i) {
+		string& name = cs[i]; int x = xs[i]; int y = ys[i];
+		cities[i].Set(i, name, x, y);
+		citiesMap[name] = &cities[i];
+		distsX[x].push_back(i);
+		distsY[y].push_back(i);
+	}
+
+	const int NONE_IDX = -1;
+	const int DEFAULT_CLOSEST = std::pow(10, 9) + 1;
+	std::function<int(vector<int>*, int, int)> closestStraight = [&](vector<int>* dists, int idxFrom, int posIdxCurrent) {
+		int idx = NONE_IDX;
+		if (dists == nullptr) return idx;
+
+		int closest = DEFAULT_CLOSEST;
+		int posIdx = (posIdxCurrent + 1 % 2);
+		int pos = cities[idxFrom].Pos[posIdx];
+		for (int i = 0; i < (*dists).size(); ++i) {
+			int iter = (*dists)[i];
+			if (iter == idxFrom) continue;
+			int dist = std::abs(pos - cities[iter].Pos[posIdx]);
+			if (closest > dist){
+				closest = dist; idx = iter;
 			}
-			if (r >= 2 && r >= count - 1) {
-				repeat = sub; pos = i; len = sub.size();
-				return true;
-			}
+		}
+		return closest;
+	};
+
+	const string NONE = "NONE";
+	vector<string> outputs(qs.size());
+	map<int, vector<int>>::iterator iterX, iterY;
+	for (int i = 0; i < qs.size(); ++i) {
+		string& q = qs[i];
+		City& c = *citiesMap[q];
+		iterX = distsX.find(c.Pos[0]);
+		iterY = distsY.find(c.Pos[1]);
+		vector<int>* dsX = iterX != distsX.end()? &(iterX->second) : nullptr;
+		vector<int>* dsY = iterY != distsY.end()? &(iterY->second) : nullptr;
+		int idx = NONE_IDX;
+		idx = closestStraight(dsX, c.Idx, 0);
+		if (idx == NONE_IDX){
+			idx = closestStraight(dsY, c.Idx, 1);
+		}
+
+		string output = NONE;
+		if (idx != NONE_IDX) output = cities[idx].Name;
+		outputs[i] = output;
+	}
+	return outputs;
+}
+
+string ltrim(const string& str) {
+	string s(str);
+
+	s.erase(
+		s.begin(),
+		find_if(s.begin(), s.end(), not1(ptr_fun<int, int>(isspace)))
+	);
+
+	return s;
+}
+
+string rtrim(const string& str) {
+	string s(str);
+
+	s.erase(
+		find_if(s.rbegin(), s.rend(), not1(ptr_fun<int, int>(isspace))).base(),
+		s.end()
+	);
+
+	return s;
+}
+
+int main()
+{
+	ofstream fout(getenv("OUTPUT_PATH"));
+
+	string c_count_temp;
+	getline(cin, c_count_temp);
+
+	int c_count = stoi(ltrim(rtrim(c_count_temp)));
+
+	vector<string> c(c_count);
+
+	for (int i = 0; i < c_count; i++) {
+		string c_item;
+		getline(cin, c_item);
+
+		c[i] = c_item;
+	}
+
+	string x_count_temp;
+	getline(cin, x_count_temp);
+
+	int x_count = stoi(ltrim(rtrim(x_count_temp)));
+
+	vector<int> x(x_count);
+
+	for (int i = 0; i < x_count; i++) {
+		string x_item_temp;
+		getline(cin, x_item_temp);
+
+		int x_item = stoi(ltrim(rtrim(x_item_temp)));
+
+		x[i] = x_item;
+	}
+
+	string y_count_temp;
+	getline(cin, y_count_temp);
+
+	int y_count = stoi(ltrim(rtrim(y_count_temp)));
+
+	vector<int> y(y_count);
+
+	for (int i = 0; i < y_count; i++) {
+		string y_item_temp;
+		getline(cin, y_item_temp);
+
+		int y_item = stoi(ltrim(rtrim(y_item_temp)));
+
+		y[i] = y_item;
+	}
+
+	string q_count_temp;
+	getline(cin, q_count_temp);
+
+	int q_count = stoi(ltrim(rtrim(q_count_temp)));
+
+	vector<string> q(q_count);
+
+	for (int i = 0; i < q_count; i++) {
+		string q_item;
+		getline(cin, q_item);
+
+		q[i] = q_item;
+	}
+
+	vector<string> result = closestStraightCity(c, x, y, q);
+
+	for (int i = 0; i < result.size(); i++) {
+		fout << result[i];
+
+		if (i != result.size() - 1) {
+			fout << "\n";
 		}
 	}
 
-	return false;
-}
+	fout << "\n";
 
-void reciprocal2(int N) {
-	double r = 1.0 / (double)N;
+	fout.close();
 
-	std::stringstream stream;
-	stream << std::fixed << std::setprecision(19) << r;
-	string output(stream.str().substr(0, 19));
-	int dot = 1;
-
-	string fstr = output.substr(2, output.size() - 1);
-	string rstr;
-	int rpos = 0, rlen = 0;
-	bool isRepeat = IsRepeat(fstr, rstr, rpos, rlen);
-	
-	string result;
-	printf("%d// %d // %s // %s\n", N, isRepeat, output.c_str(), rstr.c_str());
-	 
-	//if (isRepeat){
-	//	result = output.substr(0, rpos + 2 + rlen);
-	//	printf("%s %s\n", result.c_str(), rstr.c_str());
-	//}
-	//else {
-	//	result = output;
-	//	printf("%s", result.c_str());
-	//}
-}
-
-string Divide2(int num, int div, int precise = 20) {
-	string output;
-	int n = num, d = div, r = 0, v = 0;
-	if (n < d) {
-		output += "0.";
-	}
-	else {
-		output += to_string((int)(n / d)) + ".";
-		r = n % d;
-		n = r;
-	}
-	int iter = 0;
-	while (iter++ < precise) {
-		n = n * 10;
-		char append = '0';
-		if (n >= d) {
-			r = n % d;
-			v = n / d;
-			append = '0' + v;
-			n = r;
-		}
-		output += append;
-	}
-	return output;
-}
-
-void reciprocal(int N) {
-	string output2 = Divide2(1, N, 100);
-
-	int dot = 1;
-	string fstr = output2.substr(2, output2.size() - 1);
-	string rstr;
-	int rpos = 0, rlen = 0;
-	bool isRepeat = IsRepeat(fstr, rstr, rpos, rlen);
-
-	printf("%d// %d // %s // %s\n", N, isRepeat, output2.c_str(), rstr.c_str());
-
-	//string result;
-	//if (isRepeat) {
-	//	result = output2.substr(0, rpos + 2 + rlen);
-	//	printf("%s %s\n", result.c_str(), rstr.c_str());
-	//}
-	//else {
-	//	result = output2;
-	//	printf("%s", result.c_str());
-	//}
-}
-
-int main() {
-	//int n = 0;
-	//scanf("%d", &n);
-	//reciprocal(n);
-	for (int i = 1; i < 100; ++i) {
-		reciprocal(i);
-	}
-
-	int n = 0;
-	scanf("%d", &n);
 	return 0;
 }
