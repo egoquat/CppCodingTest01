@@ -86,7 +86,6 @@ void AddAdj(vector<Node>& ns, map<int, int>& nsm, int x, int y) {
 }
 void BfsRec(vector<Node>& ns, vector<int> frs, map<int, bool>& visits, int& depth, bool skipGoal, function<bool(Node&)> call) {
 	vector<int> frsNext;
-	depth++;
 	for (int i = 0; i < frs.size(); ++i) {
 		int idx = frs[i];
 		visits[idx] = true;
@@ -101,6 +100,7 @@ void BfsRec(vector<Node>& ns, vector<int> frs, map<int, bool>& visits, int& dept
 		}
 	}
 	if (frsNext.size() <= 0) return;
+	depth++;
 	BfsRec(ns, frsNext, visits, depth, skipGoal, call);
 }
 
@@ -133,17 +133,20 @@ int minMoves(vector<vector<int>> maze, int x, int y) {
 	vector<int> gds = golds;
 	int pos = 0;
 	int move = 0;
-	// while(gds.size()>=1){
-	//     visits.clear(); frs.clear(); frs.push_back(pos); depth = 0;
-	//     BfsRec(ns, frs, visits, depth, true, [&](Node& n)
-	//     { 
-	//         if (n.Type==EType::Gold){ AddSafe(golds, n.Idx); } 
+	while (gds.size() >= 1) {
+		visits.clear(); frs.clear(); frs.push_back(pos); depth = 0;
+		BfsRec(ns, frs, visits, depth, true, [&](Node& n)
+			{
+				if (n.Type == EType::Gold && Contains(gds, n.Idx)) {
+					Remove(gds, n.Idx); pos = n.Idx;
+					return true;
+				}
+				return false;
+			});
+		move += depth;
+	}
 
-	//     });
-	// }
-
-
-	int minmove = 0;
+	int minmove = move;
 	return minmove;
 }
 
