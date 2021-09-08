@@ -146,6 +146,16 @@ int minMoves(vector<vector<int>> maze, int x, int y) {
 		move += depth;
 	}
 
+	visits.clear(); frs.clear(); frs.push_back(pos); depth = 0;
+	BfsRec(ns, frs, visits, depth, false, [&](Node& n)
+		{
+			if (n.Type == EType::Goal) {
+				return true;
+			}
+			return false;
+		});
+	move += depth;
+
 	int minmove = move;
 	return minmove;
 }
