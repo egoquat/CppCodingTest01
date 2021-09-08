@@ -14,8 +14,21 @@ using namespace std;
 
 struct City {
 	string Name;
-	int Idx, Adj = -1;
+	int Idx = -1;
 	int Pos[2];
+	City* Adj[2]{ nullptr };
+	City* GetNearst() {
+		City* adjX = Adj[0]; City* adjY = Adj[1];
+		if (adjX == nullptr) return adjY;
+		if (adjY != nullptr && GetDist(adjX, 0) > GetDist(adjY, 1)) return adjY;
+		return adjX;
+	}
+	int GetDist(City* o, int dim) { return std::abs(Pos[dim] - o->Pos[dim]); }
+	void SetAdj(City* adj, int dim) {
+		if (Adj[dim] == nullptr || GetDist(Adj[dim], dim) > GetDist(adj, dim)) {
+			Adj[dim] = adj;
+		}
+	}
 	void Set(int idx, string& name, int x, int y) { Idx = idx; Name = name; Pos[0] = x; Pos[1] = y; }
 };
 
@@ -34,25 +47,26 @@ vector<string> closestStraightCity(vector<string> cs, vector<int> xs, vector<int
 		distsY[y].push_back(i);
 	}
 
-	const int NONE_IDX = -1;
-	const int DEFAULT_FARST = std::pow(10, 9) + 1;
-	std::function<pair<int, int>(vector<int>*, int, int, pair<int, int>)> closestStraight
-			= [&](vector<int>* dists, int idxFrom, int posIdxFrom, pair<int, int> other) {
-		std::pair<int, int> idx = other;
-		if (dists == nullptr || dists->size() <= 1) return idx;
+	int dim = 0;
+	std::function<bool(int, int)> compare = [&](int a, int b) {
+		City& ca = cities[a]; City& cb = cities[b];
+		return ca.Pos[dim] < cb.Pos[dim];
+	};
 
-		int posIdx = (posIdxFrom + 1 % 2);
-		int pos = cities[idxFrom].Pos[posIdx];
-		for (int i = 0; i < (*dists).size(); ++i) {
-			int iter = (*dists)[i];
-			if (iter == idxFrom) continue;
-			int dist = std::abs(pos - cities[iter].Pos[posIdx]);
-			if (idx.second > dist){
-				idx.second = dist; idx.first = iter;
+	map<int, vector<int>>* iterations[]{ &distsY, &distsX };
+	for (int i = 0; i < 2; ++i) {
+		map<int, vector<int>>::iterator iter = iterations[i]->begin();
+		for (; iter != iterations[i]->end(); ++iter) {
+			vector<int>& line = iter->second;
+			if (line.size() <= 1) continue;
+			dim = i;
+			std::sort(line.begin(), line.end(), compare);
+			for (int j = 0; j < line.size() - 1; ++j) {
+				City& curr = cities[line[j]]; City& next = cities[line[j + 1]];
+				curr.SetAdj(&next, dim); next.SetAdj(&curr, dim);
 			}
 		}
-		return idx;
-	};
+	}
 
 	const string NONE = "NONE";
 	vector<string> outputs(qs.size());
@@ -64,16 +78,10 @@ vector<string> closestStraightCity(vector<string> cs, vector<int> xs, vector<int
 		iterCity = citiesMap.find(q);
 		if (iterCity != citiesMap.end()) {
 			City& c = *citiesMap[q];
-			iterX = distsX.find(c.Pos[0]);
-			iterY = distsY.find(c.Pos[1]);
-			vector<int>* dsX = iterX != distsX.end() ? &(iterX->second) : nullptr;
-			vector<int>* dsY = iterY != distsY.end() ? &(iterY->second) : nullptr;
-			pair<int, int> idx = pair<int, int>(NONE_IDX, DEFAULT_FARST);
-			idx = closestStraight(dsX, c.Idx, 0, idx);
-			idx = closestStraight(dsY, c.Idx, 1, idx);
-			if (idx.first != NONE_IDX) output = cities[idx.first].Name;
+			City* adj = c.GetNearst();
+			if (adj != nullptr) { output = adj->Name; }
 		}
-		
+
 		outputs[i] = output;
 	}
 	return outputs;
