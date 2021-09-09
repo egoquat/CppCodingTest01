@@ -87,9 +87,6 @@ void DfsRec(int no, umap& vs, int dlim, int d, int r, int& rmax) {
 	}
 	vs[no] = false;
 }
-int GetDistH(int a, int b) { int ha = a / Node::W, hb = b / Node::W; return std::abs(hb - ha); }
-int GetDistW(int a, int b) { int wa = a % Node::W, wb = b % Node::W; return std::abs(wb - wa); }
-int GetDist(int a, int b) { return GetDistH(a,b) + GetDistW(a,b); }
 bool Linked(const vector<int>& subset){
 	map<int, bool> contains; for (int i = 0; i < subset.size(); ++i) { contains[subset[i]] = true; }
 	map<int, bool> visits;
@@ -112,17 +109,30 @@ bool Linked(const vector<int>& subset){
 	}
 	return true;
 }
+int GetDistH(int a, int b) { int ha = a / Node::W, hb = b / Node::W; return std::abs(hb - ha); }
+int GetDistW(int a, int b) { int wa = a % Node::W, wb = b % Node::W; return std::abs(wb - wa); }
+int GetDist(int a, int b) { return GetDistH(a, b) + GetDistW(a, b); }
+bool IsOut(vector<int>& sets, int lim, int pos) {
+	for (int i = 0; i < sets.size(); ++i) {
+		if (GetDist(sets[i], pos) >= lim) return true;
+	}
+	return false;
+}
 void GetSubsetsRec(const vector<int>& ns, const int lim, int idx, vector<int>& sets, vector<vector<int>>& sets_o) {
 	if (sets.size() == lim) {
 		if (Linked(sets) == false) return;
 		sets_o.push_back(sets);
 		//TEST
-		cout << ">" << sets_o.size() <<"\t"; for (int i = 0; i < lim; ++i) { cout << sets[i] << " "; } cout << '\n';
+		//cout << ">" << sets_o.size() <<"\t"; for (int i = 0; i < lim; ++i) { cout << sets[i] << " "; } cout << '\n';
 		return;
 	}
 	for (int i = idx; i < ns.size(); ++i) {
-		if (sets.size() >= 1 && (GetDistH(Last(sets,NONE), i) >= 2 || GetDist(Last(sets, NONE), i) >= lim)) 
-			continue;
+		if (sets.size() >= 1){
+			int dh = GetDistH(Last(sets, NONE), i);
+			if (dh >= 2) continue;
+			if (IsOut(sets, lim, i) == true) continue;
+		}
+			
 		sets.push_back(i);
 		GetSubsetsRec(ns, lim, i + 1, sets, sets_o);
 		sets.pop_back();
