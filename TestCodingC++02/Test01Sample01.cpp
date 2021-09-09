@@ -1,18 +1,29 @@
+#include <map>
+#include <set>
+#include <list>
 #include <cmath>
+#include <ctime>
+#include <deque>
+#include <queue>
+#include <stack>
+#include <string>
+#include <bitset>
 #include <cstdio>
+#include <limits>
 #include <vector>
+#include <climits>
+#include <cstring>
+#include <cstdlib>
+#include <fstream>
+#include <numeric>
+#include <sstream>
 #include <iostream>
 #include <algorithm>
-#include <string>
-#include <iomanip>
-#include <sstream>
+#include <unordered_map>
 #include <functional>
-#include <map>
-#include <fstream>
 
 using namespace std;
 
-static const int IDXNONE = -1;
 template<typename T> static bool Remove(vector<T>& v, const T t)
 {
 	auto it = std::find(v.begin(), v.end(), t);
@@ -47,117 +58,64 @@ template<typename T, typename V> static V Get(map<T, V>& m, const T t, V d)
 	iter_v iter = m.find(t);
 	return iter == m.end() ? d : iter->second;
 }
-int ToCom(int x, int y) { return x << 8 | y; }
-pair<int, int> ToXY(int com) {
-	pair<int, int> v(com >> 8, com & 0xff);
-	return v;
-}
 
-enum class EType { None = 0, Block, Gold, Goal };
+typedef unordered_map<int, bool> umap;
+static const int NONE = -1;
+
 struct Node {
-	EType Type = EType::None;
-	int Idx = IDXNONE;
-	int X = -1, Y = -1;
+	int X = NONE, Y = NONE;
+	int Rsc = NONE;
 	vector<int> Adjs;
-	int ToXY() { return ToCom(X, Y); }
-	Node(int idx, EType type, int x, int y) { Idx = idx; Type = type; X = x; Y = y; }
+	void Set(int x, int y, int rsc) { X = x; Y = y; Rsc = rsc; }
 	void AddAdj(int adj) { AddSafe(Adjs, adj); }
+	static vector<Node> Ns;
 };
-void AddNode(vector<Node>& ns, map<int, int>& nsm, EType t, int x, int y) {
-	ns.push_back(Node(ns.size(), t, x, y));
-	Node* last = &ns[ns.size() - 1];
-	int com = last->ToXY();
-	nsm[com] = ns.size() - 1;
-}
-void AddAdj(vector<Node>& ns, map<int, int>& nsm, int x, int y) {
-	int k = ToCom(x, y);
-	Node& n = ns[Get(nsm, k, IDXNONE)];
-	vector<int> adjs(4);
-	adjs[0] = Get(nsm, ToCom(x + 1, y), IDXNONE);
-	adjs[1] = Get(nsm, ToCom(x, y + 1), IDXNONE);
-	adjs[2] = Get(nsm, ToCom(x - 1, y), IDXNONE);
-	adjs[3] = Get(nsm, ToCom(x, y - 1), IDXNONE);
-	for (int i = 0; i < 4; ++i) {
-		int adj = adjs[i];
-		if (adj == IDXNONE) continue;
-		n.AddAdj(adj);
-		ns[adj].AddAdj(n.Idx);
+vector<Node> Node::Ns;
+void DfsRec(int no, umap& vs, int dlim, int d, int r, int& rmax) {
+	Node& n = Node::Ns[no];
+	r = r + n.Rsc; vs[no] = true;
+	d++;
+	if (d >= dlim) { rmax = std::max(rmax, r); vs[no] = false; return; }
+	for (int i = 0; i < n.Adjs.size(); ++i) {
+		int adj = n.Adjs[i];
+		if (vs[adj] == true) continue;
+		DfsRec(adj, vs, dlim, d, r, rmax);
 	}
+	vs[no] = false;
 }
-void BfsRec(vector<Node>& ns, vector<int> frs, map<int, bool>& visits, int& depth, bool skipGoal, function<bool(Node&)> call) {
-	vector<int> frsNext;
-	for (int i = 0; i < frs.size(); ++i) {
-		int idx = frs[i];
-		visits[idx] = true;
-		Node& f = ns[idx];
-		bool isBreak = call(f);
-		if (isBreak == true) return;
-		for (int j = 0; j < f.Adjs.size(); ++j) {
-			int idxAdj = f.Adjs[j];
-			if (visits[idxAdj] == true) continue;
-			if (skipGoal == true && ns[idxAdj].Type == EType::Goal) continue;
-			AddSafe(frsNext, idxAdj);
+int GetMaxRscs(vector<vector<int>>& grid, int lim) {
+	int w = grid[0].size(), h = grid.size();
+	Node::Ns.resize(w * h);
+	for (int i = 0; i < grid.size(); ++i) {
+		for (int j = 0; j < grid[i].size(); ++j) {
+			int rsc = grid[i][j];
+			Node& node = Node::Ns[j + (i * grid.size())];
+			node.Set(j, i, rsc);
 		}
 	}
-	if (frsNext.size() <= 0) return;
-	depth++;
-	BfsRec(ns, frsNext, visits, depth, skipGoal, call);
-}
-
-int minMoves(vector<vector<int>> maze, int x, int y) {
-	vector<Node> ns;
-	map<int, int> nsm;
-	for (int i = 0; i < maze.size(); ++i) {
-		vector<int>& row = maze[i];
-		for (int j = 0; j < row.size(); ++j) {
-			EType type = (EType)row[j];
-			if (type == EType::Block) continue;
-			AddNode(ns, nsm, type, i, j);
-			AddAdj(ns, nsm, i, j);
+	function<int(int, int)> getxy = [&](int x, int y) {
+		if (x <= -1 || x >= w) return NONE; if (y <= -1 || y >= h) return NONE;
+		return x + (y * h);
+	};
+	int checks[4];
+	for (int i = 0; i < Node::Ns.size(); ++i) {
+		int x = i % w, y = i / h;
+		checks[0] = getxy(x + 1, y);
+		checks[1] = getxy(x, y + 1);
+		checks[2] = getxy(x - 1, y);
+		checks[3] = getxy(x, y - 1);
+		for (int j = 0; j < 4; ++j) {
+			if (checks[j] == NONE) continue;
+			Node::Ns[i].AddAdj(checks[j]);
+			Node::Ns[checks[j]].AddAdj(i);
 		}
 	}
-	ns[nsm[ToCom(x, y)]].Type = EType::Goal;
-
-	vector<int> golds, frs{ 0 };
-	map<int, bool> visits; bool foundGoal = false; int depth = 0;
-	BfsRec(ns, frs, visits, depth, false, [&](Node& n)
-		{
-			if (n.Type == EType::Gold) { AddSafe(golds, n.Idx); }
-			if (n.Type == EType::Goal) { foundGoal = true; }
-			return false;
-		});
-	if (false == foundGoal) {
-		return -1;
+	int rmax = 0, d = 0, r = 0; const int dlim = lim;
+	for (int i = 0; i < Node::Ns.size(); ++i) {
+		umap vs; d = r = 0;
+		DfsRec(i, vs, dlim, d, r, rmax);
 	}
-
-	vector<int> gds = golds;
-	int pos = 0;
-	int move = 0;
-	while (gds.size() >= 1) {
-		visits.clear(); frs.clear(); frs.push_back(pos); depth = 0;
-		BfsRec(ns, frs, visits, depth, true, [&](Node& n)
-			{
-				if (n.Type == EType::Gold && Contains(gds, n.Idx)) {
-					Remove(gds, n.Idx); pos = n.Idx;
-					return true;
-				}
-				return false;
-			});
-		move += depth;
-	}
-
-	visits.clear(); frs.clear(); frs.push_back(pos); depth = 0;
-	BfsRec(ns, frs, visits, depth, false, [&](Node& n)
-		{
-			if (n.Type == EType::Goal) {
-				return true;
-			}
-			return false;
-		});
-	move += depth;
-
-	int minmove = move;
-	return minmove;
+	return rmax;
 }
 
 
@@ -202,50 +160,37 @@ vector<string> split(const string& str) {
 
 int main()
 {
-    //ofstream fout(getenv("OUTPUT_PATH"));
+	//ofstream fout(getenv("OUTPUT_PATH"));
+	string read_temp;
+	vector<string> reads_temp;
 
-    string maze_rows_temp;
-    getline(cin, maze_rows_temp);
+	getline(cin, read_temp);
+	reads_temp = split(rtrim(read_temp));
 
-    int maze_rows = stoi(ltrim(rtrim(maze_rows_temp)));
+	int mars_rsc_row = stoi(ltrim(rtrim(reads_temp[0])));
+	int mars_rsc_col = stoi(ltrim(rtrim(reads_temp[1])));
+	int mars_rwc_count = stoi(ltrim(rtrim(reads_temp[2])));
 
-    string maze_columns_temp;
-    getline(cin, maze_columns_temp);
+	vector<vector<int>> mars_rscs(mars_rsc_row);
 
-    int maze_columns = stoi(ltrim(rtrim(maze_columns_temp)));
+	for (int i = 0; i < mars_rsc_row; i++) {
+		reads_temp.clear();
+		mars_rscs[i].resize(mars_rsc_col);
 
-    vector<vector<int>> maze(maze_rows);
+		getline(cin, read_temp);
+		read_temp = ltrim(rtrim(read_temp));
 
-    for (int i = 0; i < maze_rows; i++) {
-        maze[i].resize(maze_columns);
+		for (int j = 0; j < mars_rsc_col; j++) {
+			int rsc_item = (char)read_temp[j] - '0';
+			mars_rscs[i][j] = rsc_item;
+		}
+	}
 
-        string maze_row_temp_temp;
-        getline(cin, maze_row_temp_temp);
+	int result = GetMaxRscs(mars_rscs, mars_rwc_count);
 
-        vector<string> maze_row_temp = split(rtrim(maze_row_temp_temp));
+	cout << result << "\n";
 
-        for (int j = 0; j < maze_columns; j++) {
-            int maze_row_item = stoi(maze_row_temp[j]);
+	//cout.close();
 
-            maze[i][j] = maze_row_item;
-        }
-    }
-
-    string x_temp;
-    getline(cin, x_temp);
-
-    int x = stoi(ltrim(rtrim(x_temp)));
-
-    string y_temp;
-    getline(cin, y_temp);
-
-    int y = stoi(ltrim(rtrim(y_temp)));
-
-    int result = minMoves(maze, x, y);
-
-    cout << result << "\n";
-
-    //cout.close();
-
-    return 0;
+	return 0;
 }
