@@ -66,49 +66,11 @@ template<typename T, typename V> static V Get(map<T, V>& m, const T t, V d)
 	return iter == m.end() ? d : iter->second;
 }
 struct Node {
-	int X = NONE, Y = NONE, Idx = NONE;
-	int Rsc = NONE;
-	vector<int> Adjs;
-	void Set(int idx, int x, int y, int rsc) { Idx = idx; X = x; Y = y; Rsc = rsc; }
-	void AddAdj(int adj) { AddSafe(Adjs, adj); }
-	static vector<Node> Ns; static vector<int> NIs;
+	static vector<int> NIs;
+	static vector<int> NRscs;
 	static int W; static int H;
 };
-vector<Node> Node::Ns; vector<int> Node::NIs; int Node::W; int Node::H;
-void DfsRec(int no, umap& vs, int dlim, int d, int r, int& rmax) {
-	Node& n = Node::Ns[no];
-	r = r + n.Rsc; vs[no] = true;
-	d++;
-	if (d >= dlim) { rmax = std::max(rmax, r); vs[no] = false; return; }
-	for (int i = 0; i < n.Adjs.size(); ++i) {
-		int adj = n.Adjs[i];
-		if (vs[adj] == true) continue;
-		DfsRec(adj, vs, dlim, d, r, rmax);
-	}
-	vs[no] = false;
-}
-bool Linked(const vector<int>& subset){
-	map<int, bool> contains; for (int i = 0; i < subset.size(); ++i) { contains[subset[i]] = true; }
-	map<int, bool> visits;
-	vector<int> ids { subset[0] };
-	int pos = 0;
-	for (int t = 0; t < subset.size() - 1; ++t){
-		int cnt = ids.size();
-		for (int i = pos; i < cnt; ++i){
-			Node& n = Node::Ns[ids[i]];
-			visits[ids[i]] = true;
-			for (int j = 0; j < n.Adjs.size(); ++j){
-				int iA = n.Adjs[j];
-				if (visits[iA] == true || contains[iA] == false) continue;
-				AddSafe(ids, iA);
-			}
-		}
-		if (ids.size() == cnt) return false;
-		if (ids.size() == subset.size()) return true;
-		pos = cnt;
-	}
-	return true;
-}
+vector<int> Node::NIs; vector<int> Node::NRscs; int Node::W; int Node::H;
 int GetDistH(int a, int b) { int ha = a / Node::W, hb = b / Node::W; return std::abs(hb - ha); }
 int GetDistW(int a, int b) { int wa = a % Node::W, wb = b % Node::W; return std::abs(wb - wa); }
 int GetDist(int a, int b) { return GetDistH(a, b) + GetDistW(a, b); }
@@ -118,13 +80,42 @@ bool IsOut(vector<int>& sets, int lim, int pos) {
 	}
 	return false;
 }
+bool Linked2(const vector<int>& subset) {
+	map<int, bool> visits;
+	vector<int> iters { subset[0] };
+	visits[iters[0]] = true;
+	//TEST
+	//if (subset[0] + subset[1] + subset[2]+ subset[3] == 26) {
+	//	int k = 0;
+	//}
+	int pos = 0;
+	for (int n = 0; n < subset.size(); ++n) {
+		int s = iters.size();
+		for (int i = pos; i < s; ++i)
+		{
+			int v = iters[i];
+			for (int j = 0; j < subset.size(); ++j) {
+				int sub = subset[j];
+				if (visits[sub] == true) continue;
+				if (GetDist(sub, v) <= 1) {
+					iters.push_back(sub);
+					visits[sub] = true;
+				}
+			}
+		}
+		if (iters.size() == s) break;
+		pos = s;
+	}
+
+	return iters.size() == subset.size();
+}
 void GetSubsetsRec(const vector<int>& ns, const int lim, int idx, vector<int>& sets, vector<vector<int>>& sets_o) {
 	if (sets.size() == lim) {
-		if (Linked(sets) == false) return;
+		if (Linked2(sets) == false) return;
 		sets_o.push_back(sets);
 		//TEST
 		//cout << ">" << sets_o.size() <<"\t"; for (int i = 0; i < lim; ++i) { cout << sets[i] << " "; } cout << '\n';
-		return;
+		return; 
 	}
 	for (int i = idx; i < ns.size(); ++i) {
 		if (sets.size() >= 1){
@@ -146,45 +137,23 @@ void GetSubsets(const vector<int>& ns, const int lim, vector<vector<int>>& sets_
 int GetMaxRscs(vector<vector<int>>& grid, int lim) {
 	int w = grid[0].size(), h = grid.size();
 	Node::W = w; Node::H = h;
-	Node::Ns.resize(w * h);	Node::NIs.resize(w * h);
+	Node::NIs.resize(w * h); Node::NRscs.resize(w * h);
 	for (int i = 0; i < grid.size(); ++i) {
 		for (int j = 0; j < grid[i].size(); ++j) {
 			int rsc = grid[i][j], idx = j + (i * grid[i].size());
-			Node& node = Node::Ns[idx];
 			Node::NIs[idx] = idx;
-			node.Set(idx, j, i, rsc);
+			Node::NRscs[idx] = rsc;
 		}
 	}
-	function<int(int, int)> getxy = [&](int x, int y) {
-		if (x <= -1 || x >= w) return NONE; if (y <= -1 || y >= h) return NONE;
-		return x + (y * w);
-	};
-	int checks[4];
-	for (int i = 0; i < Node::Ns.size(); ++i) {
-		int x = i % w, y = i / w;
-		checks[0] = getxy(x + 1, y);
-		checks[1] = getxy(x, y + 1);
-		checks[2] = getxy(x - 1, y);
-		checks[3] = getxy(x, y - 1);
-		for (int j = 0; j < 4; ++j) {
-			if (checks[j] == NONE) continue;
-			Node::Ns[i].AddAdj(checks[j]);
-			Node::Ns[checks[j]].AddAdj(i);
-		}
-	}
+
 	int rmax = 0;
-	//int d = 0, r = 0; const int dlim = lim;
-	// for (int i = 0; i < Node::Ns.size(); ++i) {
-	//     umap vs; d = r = 0;
-	//     DfsRec(i, vs, dlim, d, r, rmax);
-	// }
 	vector<vector<int>> subsets;
 	GetSubsets(Node::NIs, lim, subsets);
 	for (int i = 0; i < subsets.size(); ++i){
 		vector<int>& sets = subsets[i];
 		int rsc = 0;
 		for (int j = 0; j < sets.size(); ++j){
-			rsc += Node::Ns[sets[j]].Rsc;
+			rsc += Node::NRscs[sets[j]];
 		}
 		rmax = std::max(rmax, rsc);
 	}
