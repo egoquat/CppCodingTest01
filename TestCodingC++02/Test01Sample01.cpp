@@ -126,6 +126,7 @@ void GetSubsetsRec(const vector<int>& ns, const int lim, int idx, vector<int>& s
 			
 		sets.push_back(i);
 		GetSubsetsRec(ns, lim, i + 1, sets, sets_o);
+
 		sets.pop_back();
 	}
 }

@@ -30,6 +30,9 @@
     <ClCompile Include="Test01Test01Divide.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Test03.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Test01Sample01.h">
