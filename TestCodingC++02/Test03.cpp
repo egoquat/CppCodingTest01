@@ -411,8 +411,10 @@ namespace namespace03 {
 			vector<int>& row = maze[i];
 			for (int j = 0; j < row.size(); ++j) {
 				EType type = (EType)row[j];
+
 				if (type == EType::Block) continue;
 				idxAdd = AddNode(ns, nsm, type, i, j);
+
 				AddAdj(ns, nsm, i, j);
 				if (type == EType::Gold) AddSafe(golds, idxAdd);
 			}
@@ -522,7 +524,7 @@ namespace namespace03 {
 
 			string maze_row_temp_temp;
 			getline(cin, maze_row_temp_temp);
-
+			
 			vector<string> maze_row_temp = split(rtrim(maze_row_temp_temp));
 
 			for (int j = 0; j < maze_columns; j++) {

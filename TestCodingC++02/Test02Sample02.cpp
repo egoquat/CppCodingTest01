@@ -91,7 +91,7 @@ namespace namespace03 {
 using namespace std;
 
 namespace namespace04 {
-	int main() {
+	int main__() {
 		int nTotal, qTotal, n = 0, q = 0;
 		cin >> nTotal >> qTotal;
 		vector<vector<int>> nums(nTotal);
@@ -351,3 +351,31 @@ namespace namespace07 {
 	}
 }
 
+#include <cmath>
+#include <cstdio>
+#include <vector>
+#include <iostream>
+#include <algorithm>
+using namespace std;
+
+namespace namespace08{
+	int main__() {
+		int cnt = 0;
+		scanf("%d", &cnt);
+		vector<int> nums(cnt);
+		for (int i = 0; i < cnt; ++i) {
+			scanf("%d", &nums[i]);
+		}
+		int epos = 0, ecnt = 0;
+		scanf("%d", &epos);
+		nums.erase(nums.begin() + epos);
+
+		scanf("%d %d", &epos, &ecnt);
+		nums.erase(nums.begin() + epos, nums.begin() + ecnt);
+
+		for (int i = 0; i < cnt; ++i) {
+			printf("%d ", nums[i]);
+		}
+		return 0;
+	}
+}
