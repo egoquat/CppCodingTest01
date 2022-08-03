@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -139,8 +139,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Test01ProgammersSumTwo.cpp" />
     <ClCompile Include="Test01ProgrammersCoding.cpp" />
     <ClCompile Include="Test01Programmers.cpp" />
+    <ClCompile Include="Test01ProgrammersFailrate.cpp" />
+    <ClCompile Include="Test01ProgrammersMinSquare.cpp" />
+    <ClCompile Include="Test01ProgrammersShortestGameMap.cpp" />
+    <ClCompile Include="Test01ProgrammersYearWeek.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Test01ProgrammersFarthest.h" />

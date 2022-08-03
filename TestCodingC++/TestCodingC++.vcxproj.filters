@@ -21,6 +21,21 @@
     <ClCompile Include="Test01Programmers.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Test01ProgrammersShortestGameMap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Test01ProgrammersFailrate.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Test01ProgammersSumTwo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Test01ProgrammersYearWeek.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Test01ProgrammersMinSquare.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Test01ProgrammersFarthest.h">
