@@ -62,6 +62,9 @@
     <ClCompile Include="Test01ProgrammersKeypadLevel1.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Test01ProgrammersDartGame.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Test01ProgrammersFarthest.h">

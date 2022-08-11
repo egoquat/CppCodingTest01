@@ -146,6 +146,7 @@
     <ClCompile Include="Test01ProgrammersCoding.cpp" />
     <ClCompile Include="Test01Programmers.cpp" />
     <ClCompile Include="Test01ProgrammersCollatz.cpp" />
+    <ClCompile Include="Test01ProgrammersDartGame.cpp" />
     <ClCompile Include="Test01ProgrammersDFSPhoto.cpp" />
     <ClCompile Include="Test01ProgrammersDistancedCkeck.cpp" />
     <ClCompile Include="Test01ProgrammersFailrate.cpp" />
