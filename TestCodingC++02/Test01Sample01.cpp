@@ -1,97 +1,74 @@
 #include <string>
-#include <vector>
-#include <map>
 #include <functional>
-#include <algorithm>
+#include <map>
 #include <iostream>
+#include <queue>
 
 using namespace std;
 
-struct Func {
-	char A, B;
-	char Eq;
-	int diff;
-	function<bool(int, int, int)> Con;
-	bool Check(string& names) {
-		int pA = names.find(A);
-		int pB = names.find(B);
-		return Con(pA, pB, diff);
-	}
-	Func() {}
-	Func(string& eq) {
-		A = eq[0]; B = eq[2]; Eq = eq[3]; diff = eq[4] - '0' + 1;
-		cout << " new Func:" << A << Eq << B << diff << endl;
-	}
-};
-
-char Chs[8] = { 'A', 'C', 'F', 'J', 'M', 'N', 'R', 'T' };
-string Names(8, ' ');
-bool visits[8] = { false };
-vector<Func> Checks;
-void dfs(int depth, int& count, const vector<string>& conds) {
-	if (depth == 8) {
-		//cout << " dfs 8 check:" << Names << endl;
-		for (int i = 0; i < conds.size(); ++i) {
-			const string& cond = conds[i];
-			const char a = cond[0];
-			const char b = cond[2];
-			const char c = cond[3];
-			const int diff = cond[4] - '0' + 1;
-			int ia = Names.find(a);
-			int ib = Names.find(b);
-			switch (c) {
-			case '=':
-				if (abs(ia - ib) != 1) return;
-				break;
-			case '>':
-				if ((abs(ia - ib) > diff) != true) return;
-				break;
-			case '<':
-				if ((abs(ia - ib) < diff) != true) return;
-				break;
-			}
-		}
-		//cout << Names << endl;
-		count++;
-	}
-	else {
-		for (int i = 0; i < 8; ++i) {
-			if (visits[i] == false) {
-				visits[i] = true;
-				Names[depth] = Chs[i];
-				dfs(depth + 1, count, conds);
-				visits[i] = false;
-			}
-		}
-	}
+bool isnum(char c) {
+	return c >= '0' && c <= '9';
 }
 
-int solution(int n, vector<string> data) {
-	map<char, function<bool(int, int, int)>> Conditions = {
-		{'>', [](int a, int b, int diff) {
-			return abs(a - b) > diff;
-		}},
-		{'<', [](int a, int b, int diff) {
-			return abs(a - b) < diff;
-		}},
-		{'=', [](int a, int b, int diff) {
-			return abs(a - b) == 1;
-		}}
+int solution(string darts) {
+	map<char, function<int(int)>> Eqs = {
+		{'S', [](int n) { return n; }},
+		{'D', [](int n) { return n * n; }},
+		{'T', [](int n) { return n * n * n; }},
+		{'*', [](int n) { return n * 2; }},
+		{'#', [](int n) { return n * -1; }},
 	};
-	Checks.resize(data.size());
-	for (int i = 0; i < data.size(); ++i) {
-		Checks[i] = Func(data[i]);
-		Checks[i].Con = Conditions[Checks[i].Eq];
+	int numunit = 0, cntsum = 0;
+	vector<int> numunits; vector<bool> stars;
+	bool isstar = false;
+	for (int i = 0; i < darts.size(); ++i) {
+		char c = darts[i];
+		bool isnumeric = isnum(c);
+		if (isnumeric == true) {
+			numunit = (numunit * 10) + (darts[i] - '0');
+			cout << " n:" << numunit;
+		}
+		else {
+			numunit = Eqs[c](numunit);
+			cout << " c:" << c << ",n:" << numunit;
+			if (c == '*') {
+				if (cntsum == 0) {
+					numunit = Eqs[c](numunit);
+				}
+				else if (cntsum == 1) {
+					if (stars[0] == false) {
+						numunits[0] = Eqs[c](numunits[0]);
+					}
+				}
+				else if (cntsum >= 2) {
+					numunits[cntsum - 1] = Eqs[c](numunits[cntsum - 1]);
+				}
+				isstar = true;
+			}
+		}
+		bool islast = ((isnumeric == false
+			&& i + 1 <= darts.size() - 1
+			&& isnum(darts[i + 1]) == true)
+			|| i == darts.size() - 1);
+		if (islast == true) {
+			cout << " a:" << numunit << endl;
+			numunits.push_back(numunit); numunit = 0; ++cntsum;
+			stars.push_back(isstar);
+		}
 	}
 
-	int answer = 0;
-	dfs(0, answer, data);
-	return answer;
+	int ans = 0;
+	for (int i = 0; i < numunits.size(); ++i) {
+		int num = numunits[i];
+		ans += num;
+		cout << " r:" << num << "/rr:" << ans << endl;
+	}
+	return ans;
 }
 
 int main() {
-	int n = 2;
-	vector<string> data = { "N~F=0", "R~T>2" };
-	int answer = solution(n, data);
+	//string input = "1S*2T*3S";
+	string input = "1S2D*3T*"; // 72
+	int output = solution(input);
 	return 0;
 }
