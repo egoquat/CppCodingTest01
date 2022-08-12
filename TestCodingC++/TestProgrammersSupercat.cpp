@@ -1,4 +1,5 @@
-//# 3/4 문제 70% success
+
+// 3번 문제 66%
 #include <string>
 #include <vector>
 #include <iostream>
