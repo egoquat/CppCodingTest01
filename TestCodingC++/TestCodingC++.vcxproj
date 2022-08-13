@@ -140,10 +140,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Test01ProgammersSumTwo.cpp" />
+    <ClCompile Include="Test01ProgrammersRightSquare.cpp" />
     <ClCompile Include="Test02Programmers124.cpp" />
     <ClCompile Include="Test03ProgrammersFarthestNode.cpp" />
-    <ClCompile Include="TestProgrammersCoding.cpp" />
-    <ClCompile Include="Test01Programmers.cpp" />
+    <ClCompile Include="Test00Programmers.cpp" />
     <ClCompile Include="Test01ProgrammersCollatz.cpp" />
     <ClCompile Include="Test01ProgrammersDartGame.cpp" />
     <ClCompile Include="Test01ProgrammersDFSPhoto.cpp" />
