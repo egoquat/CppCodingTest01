@@ -14,12 +14,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="TestProgrammersCoding.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Test01Programmers.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Test02ProgrammersGameMapShortest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -38,7 +32,7 @@
     <ClCompile Include="Test01ProgrammersDFSPhoto.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="TestProgrammersSupercat.cpp">
+    <ClCompile Include="Test00ProgrammersSupercat03.cpp">
       <Filter>InGame</Filter>
     </ClCompile>
     <ClCompile Include="Test02ProgrammersDistancedCkeck.cpp">
@@ -60,6 +54,18 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Test03ProgrammersFarthestNode.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Test00ProgrammersSupercat01.cpp">
+      <Filter>InGame</Filter>
+    </ClCompile>
+    <ClCompile Include="Test03ProgrammersJingGumBridge.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Test01ProgrammersRightSquare.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Test00Programmers.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
