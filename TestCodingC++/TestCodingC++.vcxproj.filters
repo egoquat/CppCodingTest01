@@ -68,5 +68,11 @@
     <ClCompile Include="Test00Programmers.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Test01ProgrammersOpenChattingRoom.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Test01ProgrammersMBTI.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
