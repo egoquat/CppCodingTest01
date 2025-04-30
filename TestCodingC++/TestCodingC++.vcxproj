@@ -139,7 +139,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Test00ProgrammersSupercat01.cpp" />
+    <ClCompile Include="Test00ProgrammersSArea01.cpp" />
     <ClCompile Include="Test01ProgammersSumTwo.cpp" />
     <ClCompile Include="Test01ProgrammersMBTI.cpp" />
     <ClCompile Include="Test01ProgrammersOpenChattingRoom.cpp" />
@@ -157,7 +157,7 @@
     <ClCompile Include="Test01ProgrammersMinSquare.cpp" />
     <ClCompile Include="Test02ProgrammersGameMapShortest.cpp" />
     <ClCompile Include="Test01ProgrammersYearWeek.cpp" />
-    <ClCompile Include="Test00ProgrammersSupercat03.cpp" />
+    <ClCompile Include="Test00ProgrammersSArea03.cpp" />
     <ClCompile Include="Test03ProgrammersJingGumBridge.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

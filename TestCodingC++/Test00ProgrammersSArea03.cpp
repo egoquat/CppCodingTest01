@@ -1,5 +1,5 @@
 
-// 3¹ø ¹®Á¦ 66%
+// 66%
 #include <string>
 #include <vector>
 #include <iostream>
