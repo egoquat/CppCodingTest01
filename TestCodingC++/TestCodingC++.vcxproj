@@ -159,6 +159,7 @@
     <ClCompile Include="Test01ProgrammersYearWeek.cpp" />
     <ClCompile Include="Test00ProgrammersSArea03.cpp" />
     <ClCompile Include="Test03ProgrammersJingGumBridge.cpp" />
+    <ClCompile Include="Test04ProgrammersForkliftAndCrane.cpp" />
     <ClCompile Include="Test04ProgrammersServerIncrease.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
